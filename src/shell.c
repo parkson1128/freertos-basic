@@ -174,16 +174,12 @@ void test_command(int n, char *argv[]) {
         fio_printf(1, "Open file error!\n\r");
         return;
     }
-	//int fibonacci(int x) {
+
 	int previous = -1;
 	int result = 1;
 	int i=0;
 	int sum=0;
-	int x=15;	
-	
-	//fio_printf("Please enter the nunmer for fibonacci(??)");
-	//scanf("%d",&number);
-	
+	int x=15;
 	
 	for (i = 0; i<=x; i++) {
 		sum = result + previous;
@@ -191,14 +187,8 @@ void test_command(int n, char *argv[]) {
 		result = sum;
 		fio_printf(1, "The fibonacci sequence at %d is: %d\r\n", i, result);
 	}
-	//return result;
-	//}	
-
-	//scanf("%d",&number);
- 	//result = fibonacci(number);   
-  	//fio_printf(1, "The fibonacci sequence at %s is: %s\r\n", x, result);
-
-
+	
+	
     char *buffer = "Test host_write function which can write data to output/syslog\n";
     error = host_action(SYS_WRITE, handle, (void *)buffer, strlen(buffer));
     if(error != 0) {
