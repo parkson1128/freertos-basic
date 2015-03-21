@@ -25,6 +25,7 @@ void host_command(int, char **);
 void mmtest_command(int, char **);
 void test_command(int, char **);
 void _command(int, char **);
+void new_command(int, char **);
 
 #define MKCL(n, d) {.name=#n, .fptr=n ## _command, .desc=d}
 
@@ -59,6 +60,17 @@ int parse_command(char *str, char *argv[]){
 	argv[count++]=&str[p];
 
 	return count;
+}
+
+void new_command(int n, char *argv[]){
+
+	int i=0;
+	for(i=0; i<=5; i++){
+
+	fio_printf(1, "new_command printf %d \r\n", i);
+
+	}
+
 }
 
 void ls_command(int n, char *argv[]){
