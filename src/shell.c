@@ -38,6 +38,7 @@ cmdlist cl[]={
 	MKCL(mmtest, "heap memory allocation test"),
 	MKCL(help, "help"),
 	MKCL(test, "test new function"),
+	MKCL(new, "create new task"),
 	MKCL(, ""),
 };
 
@@ -65,13 +66,29 @@ int parse_command(char *str, char *argv[]){
 void new_command(int n, char *argv[]){
 
 	int i=0;
-	for(i=0; i<=5; i++){
-
-	fio_printf(1, "new_command printf %d \r\n", i);
-
+	
+	for(i=0; i<=1; i++){
+	fio_printf(1, "new task %d \r\n", i);
 	}
 
+	//void vOtherFunction( void )
+	//{
+ 	//static unsigned char ucParameterToPass;
+ 	//xTaskHandle xHandle;
+	
+	xTaskCreate( vOtherFunction(signed portCHAR *), "new_task", 512, NULL, 1, "new_task" );
+	//vTaskDelete( xHandle );
+
+	//}
+	
+	
 }
+
+void vOtherFunction( void ){
+
+}
+
+
 
 void ls_command(int n, char *argv[]){
     fio_printf(1,"\r\n"); 
