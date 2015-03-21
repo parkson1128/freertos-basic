@@ -174,6 +174,21 @@ void test_command(int n, char *argv[]) {
         fio_printf(1, "Open file error!\n\r");
         return;
     }
+	int fibonacci(int x) {
+	int previous = -1;
+	int result = 1;
+	int i=0;
+	int sum=0;
+	for (i = 0; i <= x; i++) {
+	sum = result + previous;
+	previous = result;
+	result = sum;
+	}
+	return result;
+	}	
+
+
+
 
     char *buffer = "Test host_write function which can write data to output/syslog\n";
     error = host_action(SYS_WRITE, handle, (void *)buffer, strlen(buffer));
