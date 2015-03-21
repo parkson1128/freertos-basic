@@ -63,32 +63,18 @@ int parse_command(char *str, char *argv[]){
 	return count;
 }
 
+void vTaskCode(void *pvParameters){
+
+        fio_printf(1, "\r\n");
+	fio_printf(1, "Create a new task!\r\n");
+	
+}
+
 void new_command(int n, char *argv[]){
 
-	int i=0;
-	
-	for(i=0; i<=1; i++){
-	fio_printf(1, "new task %d \r\n", i);
-	}
-
-	//void vOtherFunction( void )
-	//{
- 	//static unsigned char ucParameterToPass;
- 	//xTaskHandle xHandle;
-	
-	xTaskCreate( vOtherFunction(signed portCHAR *), "new_task", 512, NULL, 1, "new_task" );
-	//vTaskDelete( xHandle );
-
-	//}
-	
+	xTaskCreate(vTaskCode,(signed portCHAR *)"new_task", 128, NULL, 4, NULL );
 	
 }
-
-void vOtherFunction( void ){
-
-}
-
-
 
 void ls_command(int n, char *argv[]){
     fio_printf(1,"\r\n"); 
