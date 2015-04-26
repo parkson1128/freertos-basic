@@ -67,27 +67,28 @@ void vTaskCode(void *pvParameters){
 
         fio_printf(1, "\r\n");
 	fio_printf(1, "Create a new task!\r\n");
-	
+	while(1);	
 }
 
 void new_command(int n, char *argv[]){
 
-	xTaskCreate(vTaskCode,(signed portCHAR *)"new_task", 128, NULL, 4, NULL );
-	
+	xTaskCreate(vTaskCode,
+	            (signed portCHAR *) "newtask",
+	            256 /* stack size */, NULL, tskIDLE_PRIORITY + 2, NULL);	
 }
 
 void ls_command(int n, char *argv[]){
-    fio_printf(1,"\r\n"); 
-    int dir;
-    if(n == 0){
+        fio_printf(1,"\r\n"); 
+        int dir;
+        if(n == 0){
         dir = fs_opendir("");
-    }else if(n == 1){
+        }else if(n == 1){
         dir = fs_opendir(argv[1]);
         //if(dir == )
-    }else{
+        }else{
         fio_printf(1, "Too many argument!\r\n");
         return;
-    }
+        }
 (void)dir;   // Use dir
 }
 
@@ -106,7 +107,7 @@ int filedump(const char *filename){
 		fio_write(1, buf, count);
     }
 	
-    fio_printf(1, "\r");
+        fio_printf(1, "\r");
 
 	fio_close(fd);
 	return 1;
@@ -126,12 +127,12 @@ void cat_command(int n, char *argv[]){
 		return;
 	}
 
-    int dump_status = filedump(argv[1]);
+        int dump_status = filedump(argv[1]);
 	if(dump_status == -1){
 		fio_printf(2, "\r\n%s : no such file or directory.\r\n", argv[1]);
-    }else if(dump_status == -2){
+        }else if(dump_status == -2){
 		fio_printf(2, "\r\nFile system not registered.\r\n", argv[1]);
-    }
+        }
 }
 
 void man_command(int n, char *argv[]){
@@ -143,16 +144,16 @@ void man_command(int n, char *argv[]){
 	char buf[128]="/romfs/manual/";
 	strcat(buf, argv[1]);
 
-    int dump_status = filedump(buf);
+        int dump_status = filedump(buf);
 	if(dump_status < 0)
 		fio_printf(2, "\r\nManual not available.\r\n");
 }
 
 void host_command(int n, char *argv[]){
-    int i, len = 0, rnt;
-    char command[128] = {0};
+        int i, len = 0, rnt;
+        char command[128] = {0};
 
-    if(n>1){
+        if(n>1){
         for(i = 1; i < n; i++) {
             memcpy(&command[len], argv[i], strlen(argv[i]));
             len += (strlen(argv[i]) + 1);
@@ -161,10 +162,10 @@ void host_command(int n, char *argv[]){
         command[len - 1] = '\0';
         rnt=host_action(SYS_SYSTEM, command);
         fio_printf(1, "\r\nfinish with exit code %d.\r\n", rnt);
-    } 
-    else {
-        fio_printf(2, "\r\nUsage: host 'command'\r\n");
-    }
+   	} 
+   	else {
+       		 fio_printf(2, "\r\nUsage: host 'command'\r\n");
+   	}
 }
 
 void help_command(int n,char *argv[]){
@@ -176,48 +177,66 @@ void help_command(int n,char *argv[]){
 }
 
 void test_command(int n, char *argv[]) {
-    int handle;
-    int error;
+        int handle;
+        int error;
 
-    fio_printf(1, "\r\n");
-    
-    handle = host_action(SYS_SYSTEM, "mkdir -p output");
-    handle = host_action(SYS_SYSTEM, "touch output/syslog");
-
-    handle = host_action(SYS_OPEN, "output/syslog", 8);
-    if(handle == -1) {
-        fio_printf(1, "Open file error!\n\r");
-        return;
-    }
-
+        fio_printf(1, "\r\n");
+    	
 	int previous = -1;
-	int result = 1;
-	int i=0;
-	int sum=0;
-	int x=15;
+        int result = 1;
+        int i=0;
+        int sum=0;
+        int x=15;
 	
-	for (i = 0; i<=x; i++) {
-		sum = result + previous;
-		previous = result;
-		result = sum;
-		fio_printf(1, "The fibonacci sequence at %d is: %d\r\n", i, result);
+        for (i = 0; i<=x; i++) {
+            sum = result + previous;
+ 	    previous = result;
+	    result = sum;
+	    fio_printf(1, "The fibonacci sequence at %d is: %d\r\n", i, result);
 	}
-	
-	
-    char *buffer = "Test host_write function which can write data to output/syslog\n";
-    error = host_action(SYS_WRITE, handle, (void *)buffer, strlen(buffer));
-    if(error != 0) {
-        fio_printf(1, "Write file error! Remain %d bytes didn't write in the file.\n\r", error);
-        host_action(SYS_CLOSE, handle);
-        return;
-    }
 
-    host_action(SYS_CLOSE, handle);
+	signed char buf[128];
+    	char output[512] = {0};
+    	char *tag = "\nName          State   Priority  Stack  Num from shell.c\n*******************************************\n";
+    	
+    	const portTickType xDelay = 100000 / 100;
+
+    	handle = host_action(SYS_OPEN, "output/syslog", 4);
+    	if(handle == -1) {
+        	fio_printf(1, "Open file error!\n");
+        	return;
+    	}
+
+    	while(1) {
+        	memcpy(output, tag, strlen(tag));
+        	error = host_action(SYS_WRITE, handle, (void *)output, strlen(output));
+        	if(error != 0) {
+            	fio_printf(1, "Write file error! Remain %d bytes didn't write in the file.\n\r", error);
+            	host_action(SYS_CLOSE, handle);
+            	return;
+        	}
+        	vTaskList(buf);
+
+        	memcpy(output, (char *)(buf + 2), strlen((char *)buf) - 2);
+
+        	error = host_action(SYS_WRITE, handle, (void *)buf, strlen((char *)buf));
+        	if(error != 0) {
+            	fio_printf(1, "Write file error! Remain %d bytes didn't write in the file.\n\r", error);
+            	host_action(SYS_CLOSE, handle);
+            	return;
+        	}
+
+        	vTaskDelay(xDelay);
+    	}
+    
+    	host_action(SYS_CLOSE, handle);
+
+	
 }
 
 void _command(int n, char *argv[]){
-    (void)n; (void)argv;
-    fio_printf(1, "\r\n");
+        (void)n; (void)argv;
+        fio_printf(1, "\r\n");
 }
 
 cmdfunc *do_command(const char *cmd){
